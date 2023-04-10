@@ -3,6 +3,8 @@ package api.com.tecmhaicky.primeiraapijava.Controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import api.com.tecmhaicky.primeiraapijava.Models.Pessoa;
 import api.com.tecmhaicky.primeiraapijava.Repositorio.repositorio;
+import api.com.tecmhaicky.primeiraapijava.Servico.servico;
+
 
 @RestController
 public class controller {
@@ -20,11 +24,19 @@ public class controller {
     @Autowired
     private repositorio acao;
 
+    @Autowired
+    private servico servico;
+
     // Api/Pessoas - [CRUD]
         // Create [C]
+        // @PostMapping("/api/pessoas")
+        // public Pessoa cadastrarPessoa(@RequestBody Pessoa p){
+        //     return acao.save(p);
+        // }
+
         @PostMapping("/api/pessoas")
-        public Pessoa cadastrarPessoa(@RequestBody Pessoa p){
-            return acao.save(p);
+        public ResponseEntity<?> cadastrarPessoa(@RequestBody Pessoa novaPessoa) {
+            return servico.cadastro(novaPessoa);
         }
 
         // Read [R]
@@ -115,5 +127,11 @@ public class controller {
     @PostMapping("/pessoa")
     public Pessoa pessoa(@RequestBody Pessoa p) {
         return p;
+    }
+
+    // Respondendo com status
+    @GetMapping("/status")
+    public ResponseEntity<?> RotaStatus() {
+        return new ResponseEntity<>("Cadastro criado", HttpStatus.CREATED);
     }
 }
