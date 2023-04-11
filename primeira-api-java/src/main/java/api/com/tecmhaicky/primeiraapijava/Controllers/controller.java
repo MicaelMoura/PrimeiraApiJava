@@ -1,9 +1,6 @@
 package api.com.tecmhaicky.primeiraapijava.Controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,27 +10,20 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import api.com.tecmhaicky.primeiraapijava.Models.Cliente;
 import api.com.tecmhaicky.primeiraapijava.Models.Pessoa;
-import api.com.tecmhaicky.primeiraapijava.Repositorio.repositorio;
 import api.com.tecmhaicky.primeiraapijava.Servico.servico;
+import jakarta.validation.Valid;
 
 
 @RestController
 public class controller {
     
     @Autowired
-    private repositorio acao;
-
-    @Autowired
     private servico servico;
 
     // Api/Pessoas - [CRUD]
         // Create [C]
-        // @PostMapping("/api/pessoas")
-        // public Pessoa cadastrarPessoa(@RequestBody Pessoa p){
-        //     return acao.save(p);
-        // }
-
         @PostMapping("/api/pessoas")
         public ResponseEntity<?> cadastrarPessoa(@RequestBody Pessoa novaPessoa) {
             return servico.cadastro(novaPessoa);
@@ -42,73 +32,68 @@ public class controller {
         // Read [R]
             // Retorna a pessoa pelo id
             @GetMapping("/api/pessoas/{id}")
-            public Pessoa readPessoa(@PathVariable int id){
-                return acao.findById(id);
+            public ResponseEntity<?> readPessoa(@PathVariable int id){
+                return servico.selecionaPessoa(id);
             }
             
             // Retornar todas as pessoas cadastradas
             @GetMapping("/api/pessoas")
-            public List<Pessoa> listarPessoas(){
-                return acao.findAll();
+            public ResponseEntity<?> listarPessoas(){
+                return servico.listaPessoas();
             }
 
             // Retorna todas as pessoas pela idade
             @GetMapping("/api/pessoas/idade/{idade}")
-            public List<Pessoa> listarPessoasIdade(@PathVariable int idade){
-                return acao.findByIdade(idade);
+            public ResponseEntity<?> listarPessoasIdade(@PathVariable int idade){
+                return servico.selecionaIdade(idade);
             }
 
             // Retorna a quantidade de registros
             @GetMapping("/api/count")
-            public String contarPessoas(){
-                return "Existem atualmente " + acao.count() + " pessoas cadastradas";
+            public Long contarPessoas(){
+                return servico.countPessoas();
             }
 
             // Retorna todas as pessoas com os nomes ordenados
-            @GetMapping("/api/pessoas/ordernomes")
-            public List<Pessoa> ordenarNomes(){
-                return acao.findByOrderByNome();
+            @GetMapping("/api/pessoas/ordernomes/{ordenador}/{order}")
+            public ResponseEntity<?> ordenarNomes(@PathVariable String ordenador, @PathVariable String order){
+                return servico.selecionaPessoasOrdenadas(ordenador, order);
             }
             
             // Retorna as pessoas com nome igual, do mais velho para o mais novo
             @GetMapping("/api/pessoas/nomeidadedesc/{nome}")
-            public List<Pessoa> nomeIdadeDesc(@PathVariable String nome){
-                return acao.findByNomeOrderByIdade(nome);
+            public ResponseEntity<?> nomeIdadeDesc(@PathVariable String nome){
+                return servico.buscaNome(nome);
             }
 
             // Retorna todas as pessoas com que contém o terno passado = LIKE
             @GetMapping("/api/pessoas/nomecontem/{termo}")
-            public List<Pessoa> listaNomesLike(@PathVariable String termo){
-                return acao.findByNomeContaining(termo);
+            public ResponseEntity<?> listaNomesLike(@PathVariable String termo){
+                return servico.buscaContainig(termo);
             }
             
             // Soma das idades de todos
             @GetMapping("/api/pessoas/somaIdades")
             public int somaIdades(){
-                return acao.somaIdades();
+                return servico.somaIdadesTodos();
             }
 
             // Traz maior ou igual a idade informada
             @GetMapping("/api/pessoas/idadeMI/{idade}")
-            public List<Pessoa> idadeMaiorIgual(@PathVariable int idade){
-                return acao.idadeMaiorIgual(idade);
+            public ResponseEntity<?> idadeMaiorIgual(@PathVariable int idade){
+                return servico.pessoasIdadeMaiorIgual(idade);
             }
 
         // Update [U]
         @PutMapping("/api/pessoas")
-        public Pessoa putPessoa(@RequestBody Pessoa p){
-            return acao.save(p);
+        public ResponseEntity<?> putPessoa(@RequestBody Pessoa p){
+            return servico.editar(p);
         }
         
         // Delete [D]
         @DeleteMapping("/api/pessoas/{id}")
-        public String deletePessoa(@PathVariable int id){
-            //Pessoa p = acao.findById(id);
-
-            //acao.delete(p);
-            acao.deleteById(id);
-
-            return "Pessoa excluída";
+        public ResponseEntity<?> deletePessoa(@PathVariable int id){
+            return servico.deletar(id);
         }
 
     // Rota Principal    
@@ -117,21 +102,27 @@ public class controller {
         return "Hello - Yo Soy la Raiz";
     }
 
-    // Rota Bem-vindos, nome!
-    @GetMapping("/bv/{nome}")
-    public String bv(@PathVariable String nome) {
-        return "Seja bem vindo, " + nome + "!";
-    }
+    // // Rota Bem-vindos, nome!
+    // @GetMapping("/bv/{nome}")
+    // public String bv(@PathVariable String nome) {
+    //     return "Seja bem vindo, " + nome + "!";
+    // }
 
-    // Rota com POST
-    @PostMapping("/pessoa")
-    public Pessoa pessoa(@RequestBody Pessoa p) {
-        return p;
-    }
+    // // Rota com POST
+    // @PostMapping("/pessoa")
+    // public Pessoa pessoa(@RequestBody Pessoa p) {
+    //     return p;
+    // }
 
-    // Respondendo com status
-    @GetMapping("/status")
-    public ResponseEntity<?> RotaStatus() {
-        return new ResponseEntity<>("Cadastro criado", HttpStatus.CREATED);
+    // // Respondendo com status
+    // @GetMapping("/status")
+    // public ResponseEntity<?> RotaStatus() {
+    //     return new ResponseEntity<>("Cadastro criado", HttpStatus.CREATED);
+    // }
+
+    // Cadastra via JPA
+    @PostMapping("/cadastrar")
+    public void cadastrarNovaPessoa(@Valid @RequestBody Cliente obj) {
+
     }
 }
